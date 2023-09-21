@@ -31,28 +31,26 @@ driver = webdriver.Chrome(options=options)
 driver.execute_cdp_cmd("Network.setUserAgentOverride", {"userAgent": user_agent[0]})
 driver.execute_cdp_cmd('Emulation.setScriptExecutionDisabled', {'value': True})
 driver.get('https://bflix.io/movie/the-quintessential-quintuplets-movie-20r64/1-1')
-driver.implicitly_wait(5)
-print('Hits ended')	
-
-# element1 = wait.until(EC.presence_of_element_located((By.ID, 'servers')))
-# element = wait.until(EC.visibility_of_element_located((By.XPATH, '//section[@id="servers"]')))
-# element = wait.until(EC.visibility_of_element_located((By.XPATH, '//li[@class="server"]')))
-# element = wait.until(EC.presence_of_element_located((By.XPATH, '//li[@data-id="45"]')))
-# element = wait.until(EC.presence_of_element_located((By.XPATH, '//li[@class="server"]')))
-# section = wait.until(EC.presence_of_element_located((By.ID, 'servers')))
+print(driver.execute_script("return document.body.scrollHeight"))
+time.sleep(5)
+print('Hits ended')
 
 wait = WebDriverWait(driver, 20)
 section = wait.until(EC.presence_of_element_located((By.ID, 'servers')))
-print('Section found ' + section.text + ' end')
-# Now, wait for the <ul> element within the <section> to have child <li> elements
-# ul_element = wait.until(EC.presence_of_element_located((By.XPATH, '//section[@id="servers"]//ul[li]')))
 ul_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "li.server[data-id*='45']")))
 
-print('Section content found')
-serverType = ul_element.text
+print(driver.execute_script("return document.body.scrollHeight"))
 
-driver.quit()
-serverType = ul_element.text
+JS_get_network_requests = "var performance = window.performance || window.msPerformance || window.webkitPerformance || {}; var network = performance.getEntries() || {}; return network;"
+network_requests = driver.execute_script(JS_get_network_requests)
+for n in network_requests:
+    if ".m3u8" in n["name"]: 
+        print(n["name"])
+
+with open('sample2.html', 'w', encoding='utf-8') as file:
+    file.write(driver.page_source)
+
+serverType = section.text
 print('\|/')
 print(serverType)
 print('/|\\')
