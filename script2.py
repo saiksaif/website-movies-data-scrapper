@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromeService
 import random
 import time
@@ -20,60 +20,86 @@ user_agents = [
 ]
 user_agent = random.choice(user_agents)
 
+
 options = webdriver.ChromeOptions()
-options.add_argument("--headless")
+# options.add_argument("--headless")
 options.add_argument("--window-size=1920x1080")
 options.add_argument("--disable-blink-features=AutomationControlled")
-# options.add_argument("--disable-gpu")
 options.add_argument('--lang=en_US') 
+options.add_argument("--log-level=2")
+# options.add_argument('--ignore-certificate-errors')
+# options.add_argument('--ignore-certificate-errors-spki-list')
+# options.add_argument('--ignore-ssl-errors')
 options.add_argument('--no-sandbox')
 options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option("useAutomationExtension", False) 
-
+options.page_load_strategy = 'none'
 
 print('Staring hits')
-driver = webdriver.Chrome(options=options)
-str1 = driver.capabilities['browserVersion']
-str2 = driver.capabilities['chrome']['chromedriverVersion'].split(' ')[0]
-print(str1)
-print(str2)
-if str1[0:2] != str2[0:2]: 
-  print("please download correct chromedriver version")
+service = ChromeService(executable_path=r"C:\Users\saifa\OneDrive\Desktop\BFLIX\webDrivers\chromedriver.exe")
+driver = webdriver.Chrome(options=options, service=service)
 
-# driver = webdriver.Chrome(options=options)
 driver.execute_cdp_cmd("Network.setUserAgentOverride", {"userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"})
-driver.execute_cdp_cmd('Emulation.setScriptExecutionDisabled', {'value': True})
+# driver.execute_cdp_cmd('Emulation.setScriptExecutionDisabled', {'value': True})
 driver.get('https://bflix.io/movie/the-quintessential-quintuplets-movie-20r64/1-1')
+# body_element = EC.presence_of_element_located(By.TAG_NAME, "body")
+# driver.send_keys(Keys.ESCAPE)
+# driver.execute_script('return window.stop')
+driver.implicitly_wait(10)
 print(driver.execute_script("return document.body.scrollHeight"))
-# time.sleep(5)
+# print(driver.execute_script("console.log = function() {};"))
 print('Hits ended')
 
 wait = WebDriverWait(driver, 20)
-section = wait.until(EC.presence_of_element_located((By.ID, 'servers')))
+try:
+    myElem = wait.until(EC.presence_of_element_located((By.ID, 'servers')))
+    print("Servers found!")
+    print(driver.execute_script("return document.body.scrollHeight"))
+    driver.execute_script('return window.stop')
+    # try:
+    #     myElem = wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'server')))
+    #     print("Server childs found!")
+    #     print(driver.execute_script("return document.body.scrollHeight"))
+        # driver.execute_script('return window.stop')
+    driver.get_screenshot_as_file('screenshot.png')
+    # except:
+    #     print("Loading took too much time!")
+    #     print(driver.execute_script("return document.body.scrollHeight"))
+except:
+    print("Loading took too much time!")
+    print(driver.execute_script("return document.body.scrollHeight"))
+    # driver.get_screenshot_as_file('screenshot.png')
+    
+print('Page length before all JS runs')
+print(driver.execute_script("return document.body.scrollHeight"))
 
-# Wait for JavaScript to load using the custom condition
-# wait = WebDriverWait(driver, 10)
-wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
-
-driver.get_screenshot_as_file('screenshot.png')
+try:
+    wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
+    print('Page length after all JS runs')
+    print(driver.execute_script("return document.body.scrollHeight"))
+except:
+    print("All JS did not run, here is the page length!")
+    print(driver.execute_script("return document.body.scrollHeight"))
 # loginBtn = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "signin")))
 # ul_element = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "server")))
 # ul_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "li.server[data-id='45']")))
 
+print('Final Page Length')
 print(driver.execute_script("return document.body.scrollHeight"))
 
-JS_get_network_requests = "var performance = window.performance || window.msPerformance || window.webkitPerformance || {}; var network = performance.getEntries() || {}; return network;"
-network_requests = driver.execute_script(JS_get_network_requests)
-for n in network_requests:
-    if ".m3u8" in n["name"]: 
-        print(n["name"])
+# JS_get_network_requests = "var performance = window.performance || window.msPerformance || window.webkitPerformance || {}; var network = performance.getEntries() || {}; return network;"
+# network_requests = driver.execute_script(JS_get_network_requests)
+# for n in network_requests:
+#     if ".m3u8" in n["name"]: 
+#         print(n["name"])
 
 with open('sample2.html', 'w', encoding='utf-8') as file:
     file.write(driver.page_source)
 
-serverType = section.text
-print(serverType)
+# serverType = section.text
+# print(serverType)
+# input('Press ENTER to close the automated browser')
 driver.quit()
 
 # #####################################################################################################################
