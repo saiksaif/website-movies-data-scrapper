@@ -1,45 +1,42 @@
-from selenium import webdriver
-from selenium_stealth import stealth
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.support.ui import WebDriverWait
+import undetected_chromedriver as uc 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
 
-options = webdriver.ChromeOptions()
-options.add_argument("start-maximized")
-options.add_argument("--headless")
-options.add_argument("--log-level=2")
-options.add_experimental_option("excludeSwitches", ["enable-automation"])
-options.add_experimental_option('useAutomationExtension', False)
-service = ChromeService(executable_path=r"C:\Users\saifa\OneDrive\Desktop\BFLIX\webDrivers\chromedriver.exe")
-driver = webdriver.Chrome(options=options, service=service)
+options = uc.ChromeOptions() 
+options.add_argument("--user-data-dir=C:\\Users\\saifa\\AppData\\Local\\Google\\Chrome\\User Data")
+options.add_argument("--disable-gpu")
+ 
+driver = uc.Chrome(options=options)
+# driver.execute_cdp_cmd("Emulation.setCPUThrottlingRate", {'rate': 10})
+driver.get('https://bflix.io/movie/the-quintessential-quintuplets-movie-20r64/1-1')
 
-stealth(driver,
-        languages=["en-US", "en"],
-        vendor="Google Inc.",
-        platform="Win32",
-        webgl_vendor="Intel Inc.",
-        renderer="Intel Iris OpenGL Engine",
-        fix_hairline=True,
-        )
+wait = WebDriverWait(driver, 20)
+try:
+    myElem = wait.until(EC.presence_of_element_located((By.ID, 'servers')))
+    try:
+        ul_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "li.server[data-id='45']")))       
+        try:
+            ul_element.click()
+            try:
+                player = wait.until(EC.presence_of_element_located((By.ID, 'player')))
+                urlPopup = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "a[title='Click or right click to open the m3u8 URL']")))
+                targetLink = urlPopup.get_attribute("href")
+            except:
+                print('Unable to locate player')            
+        except:
+            print('Unable to click button')
+    except:
+        print("Loading 2 took too much time!")
+except:
+    print("Loading took too much time!")
+try:
+    date_element = wait.until(EC.presence_of_element_located((By.XPATH, '//span[@itemprop="dateCreated"]')))
+    date_created = date_element.text
+except:
+    print("Unable to find date")
 
-url2 = "https://developer-tools.jwplayer.com/stream-tester"
-driver.get(url2)
-
-driver.get_screenshot_as_file('screenshot-sniffer.png')
-    
-JS_get_network_requests = "var performance = window.performance || window.msPerformance || window.webkitPerformance || {}; var network = performance.getEntries() || {}; return network;"
-network_requests = driver.execute_script(JS_get_network_requests)
-for n in network_requests:
-    if ".m3u8" in n["name"]: 
-        print(n["name"])
-
-# Actual m3u8 link
-# https://videos-cloudfront-usp.jwpsrv.com/650e0a77_ab6e2122a67d4627430adfbfa4d6a71139881567/site/LOPLPiDX/media/yp34SRmf/version/IFBsp7yL/manifest.ism/manifest-audio_eng=112000-video_eng=405144.m3u8
-# Sniffed m3u8 link
-# https://videos-cloudfront-usp.jwpsrv.com/650e0a77_ab6e2122a67d4627430adfbfa4d6a71139881567/site/LOPLPiDX/media/yp34SRmf/version/IFBsp7yL/manifest.ism/manifest-audio_eng=112000-video_eng=936240.m3u8
-
-print('Final Page Length')
-print(driver.execute_script("return document.body.scrollHeight"))
-driver.quit()
+print(date_created)
+print(targetLink)
+driver.get_screenshot_as_file('screenshot-uc.png')
+driver.close
