@@ -45,7 +45,9 @@ import undetected_chromedriver as uc
 Other than these you must have the following on your system:
 
 1- Google Chrome
+
 2- Python (3.11 used in this project)
+
 3- A user profile signed in on google chrome
 
 # Running the Bot
