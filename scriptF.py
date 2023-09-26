@@ -4,13 +4,10 @@ from bs4 import BeautifulSoup
 import csv
 import os
 import time
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service as ChromeService
 import undetected_chromedriver as uc
 
 def has_only_poster_class(tag):
@@ -133,5 +130,3 @@ for n in range(2, 3):
     time.sleep(5)
 
 driver.quit()
-
-# run_movie_date_getter('https://bflix.io/movie/the-quintessential-quintuplets-movie-20r64/1-1')
