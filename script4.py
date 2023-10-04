@@ -1,4 +1,5 @@
 import undetected_chromedriver as uc 
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -6,16 +7,18 @@ from selenium.webdriver.support import expected_conditions as EC
 options = uc.ChromeOptions() 
 options.add_argument("--user-data-dir=C:\\Users\\saifa\\AppData\\Local\\Google\\Chrome\\User Data")
 options.add_argument("--disable-gpu")
+# options.add_argument("--disable-dev-shm-usage")
  
 driver = uc.Chrome(options=options)
 # driver.execute_cdp_cmd("Emulation.setCPUThrottlingRate", {'rate': 10})
-driver.get('https://bflix.io/movie/the-quintessential-quintuplets-movie-20r64/1-1')
+driver.get('https://bflix.to/movie/free-from-the-shadows-hd-ww98l/1-1')
 
+targetLink = '--empty--'
 wait = WebDriverWait(driver, 20)
 try:
-    myElem = wait.until(EC.presence_of_element_located((By.ID, 'servers')))
+    myElem = wait.until(EC.visibility_of_element_located((By.ID, 'film-servers')))
     try:
-        ul_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "li.server[data-id='45']")))       
+        ul_element = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.film-server[data-id='45']")))  
         try:
             ul_element.click()
             try:
